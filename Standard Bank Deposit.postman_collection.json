@@ -1,0 +1,734 @@
+{
+	"info": {
+		"_postman_id": "d608cbcd-bc9a-4cb9-9888-5ae49f200c4b",
+		"name": "Standard Bank Deposit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Deposit - Customer not verified yet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(500);\r",
+							"});\r",
+							"\r",
+							"const reponse = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that the correct message is returned for an unverified user\", ()=>{\r",
+							"\r",
+							"    pm.expect(reponse.detail).to.eql(\"Customer is not yet verified and verification tier is null or empty.\")\r",
+							"})\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{unverifiedCustomer}}\",\"DepositAmount\":{{$randomInt}},\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - Non existing customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 500\", ()=> {\r",
+							"    pm.response.to.have.status(500);\r",
+							"});\r",
+							"\r",
+							" const jsonData = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Assert that the request was sent successfully.\", ()=>{\r",
+							"   \r",
+							"     pm.expect(jsonData.type).to.eql(\"about:blank\")\r",
+							"     pm.expect(jsonData.title).to.eql(\"Unhandled Exception occured\")\r",
+							"     pm.expect(jsonData.detail).to.contain(\"Customer not found with Deposit Reference\")\r",
+							"    \r",
+							"\r",
+							"})\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{$randomBitcoin}}\",\"DepositAmount\":{{$randomInt}},\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - one rand",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that a user is able to deposit one rand\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).to.not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositOneRand}}\",\"DepositAmount\":1.00,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - Deposit the same amount twice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that a valid message is returned should a user deposit the same amount twice\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).to.not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositOneRand}}\",\"DepositAmount\":1.00,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - Minus one rand deposit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that a correct message is returned should a user deposit an amount less that zero\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(false)\r",
+							"    pm.expect(response.reason).to.eql(\"Invalid amount: Deposit amount cannot be less or equal to 0\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositMinusOneRand}}\",\"DepositAmount\":-1.00,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - zero rand",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that an incorrect message is returned should a user deposit zero rands\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).to.not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(false)\r",
+							"    pm.expect(response.reason).to.eql(\"Invalid amount: Deposit amount cannot be less or equal to 0\")\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositZeroRands}}\",\"DepositAmount\":0.00,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - any amount between 0 and million rands",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"let response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that the deposit was sent successfully\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const num = pm.variables.replaceIn(Math.floor(Math.random() * 1000000) + 0) ;\r",
+							"pm.environment.set(\"depositAmount\", num);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositRandomAmounts}}\",\"DepositAmount\":{{depositAmount}},\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - 999999",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that a user is able to deposit 99999 successfully\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{deposit99999}}\",\"DepositAmount\":999999.99,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - one million",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that a user is able to deposit a million rand successfully\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositAmillion}}\",\"DepositAmount\":1000000.0,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - deposit to a British pound account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Deposit to a British pound account\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{britishPoundDeposit}}\",\"DepositAmount\":{{$randomInt}},\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - one million and 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Deposit an amount greater than a million rand\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{depositAmillionAndOne}}\",\"DepositAmount\":1000001.00,\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deposit - deposit to a British pound account twice in one day",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", ()=> {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json()\r",
+							"\r",
+							"pm.test(\"Ensure that a correct message is returned should a user deposit twice to a British pound account\", ()=>{\r",
+							"\r",
+							"    pm.expect(response.orderId).not.eql(null)\r",
+							"    pm.expect(response.success).to.eql(true)\r",
+							"    pm.expect(response.reason).to.eql(\"Success\")\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"DepositOrderReference\":\"{{britishPoundDeposit}}\",\"DepositAmount\":{{$randomInt}},\"BankReference\":\"{{$randomBankAccountIban}}\"}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/orders/fiat/deposit/zar/standardBank",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"orders",
+						"fiat",
+						"deposit",
+						"zar",
+						"standardBank"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "DepositOrderReference",
+			"value": "Deposit Order Reference",
+			"type": "default"
+		}
+	]
+}
